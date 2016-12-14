@@ -17,6 +17,7 @@ public:
 
     ofParameterGroup ui;
     
+    ofParameter<bool> bOuterContour;    
     vector<ofPolyline> contours;
     vector<ofPolyline> outer;
     
@@ -30,7 +31,7 @@ private:
     ofParameter<bool> bSmoothInner;
     ofParameter<bool> bContourMode;
     ofParameter<int> contoursSeparation;
-    ofParameter<bool> bOuterContour;
+
 
     float scaleX;
     float scaleY;

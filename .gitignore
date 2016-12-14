@@ -98,3 +98,6 @@ Desktop.ini
 *.log
 *.sql
 *.sqlite
+
+# extra
+app_kinect-cv-tests/bin/data/screnshot*

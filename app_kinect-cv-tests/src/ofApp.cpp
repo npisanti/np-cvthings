@@ -8,6 +8,7 @@
 void ofApp::setup() {
     
     ofEnableAlphaBlending();
+    ofDisableAntiAliasing();
     selector = 0;
 
     // --------------------------------------KINECT-------------------------------------
@@ -17,7 +18,7 @@ void ofApp::setup() {
 	kinect.open();		// opens first available kinect
 
 	// tilt on startup
-	angle = 15;
+	angle = 0;
 	kinect.setCameraTiltAngle(angle);
     // ----------------------------------------------------------------------------------
     
@@ -100,15 +101,17 @@ void ofApp::draw() {
         case 0:
             ofBackground(0); 
             ofSetColor(255);
-            tMasker.tImage.draw(360, 0);
-            ofDrawBitmapString( "thresholded image", 20, 20);
+            tMasker.tImage.draw(320, 0);
+            ofNoFill();
+            ofDrawRectangle( 319, 1, 640, 480 );
+            if(bDrawGui) ofDrawBitmapString( "thresholded image", 20, 20);
         break;
         
         case 1:
             ofBackground(60); 
             ofSetColor(255, 95, 95);  
             tMasker.draw( 0, 0 );
-            ofDrawBitmapString( "alpha mask from threshold", 20, 20);
+            if(bDrawGui) ofDrawBitmapString( "alpha mask from threshold", 20, 20);
         break;
         
         case 2:  
@@ -125,9 +128,9 @@ void ofApp::draw() {
                 
                 ofSetColor(255, 95, 95);
                 cFinder.contours[i].draw();
-                cFinder.outer[i].draw();
+                if(cFinder.bOuterContour) cFinder.outer[i].draw();
             }
-            ofDrawBitmapString( "contours processing", 20, 20);
+            if(bDrawGui) ofDrawBitmapString( "contours processing", 20, 20);
         break;
 
         case 3:    
@@ -146,7 +149,7 @@ void ofApp::draw() {
                     }
                 ofEndShape();
             ofPopMatrix();
-            ofDrawBitmapString( "frame difference columns", 20, 20);
+            if(bDrawGui) ofDrawBitmapString( "frame difference columns", 20, 20);
         }
         break;
         
@@ -154,7 +157,7 @@ void ofApp::draw() {
             ofBackground(0); 
             ofSetColor( 255, 80, 80 ); 
             difference.draw(0, 0, ofGetWidth(), ofGetHeight());
-            ofDrawBitmapString( "thresholded image frame difference with trails", 20, 20);
+            if(bDrawGui) ofDrawBitmapString( "thresholded image frame difference with trails", 20, 20);
         break;
         
     }
@@ -168,6 +171,10 @@ void ofApp::draw() {
 void ofApp::keyPressed (int key) {
 
 	switch (key) {			
+
+        case 's':
+            ofSaveScreen("screnshot-" + ofToString(ofGetFrameNum()) + ".jpg");
+        break;
 
 		case OF_KEY_UP:
 			angle++;

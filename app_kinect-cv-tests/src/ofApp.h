@@ -32,4 +32,5 @@ public:
     bool                bDrawGui;
     
     cv::Mat columnMean;
+    
 };

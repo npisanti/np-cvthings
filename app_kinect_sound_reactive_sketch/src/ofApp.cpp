@@ -75,7 +75,7 @@ void ofApp::setup() {
 	//if you want to set a different device id 
 	soundStream.setDeviceID(3); //bear in mind the device id corresponds to all audio devices, including  input-only and output-only devices.
 	
-	int bufferSize = 256;
+	int bufferSize = 512;
 	
 	left.assign(bufferSize, 0.0);
 	right.assign(bufferSize, 0.0);
@@ -210,10 +210,14 @@ void ofApp::draw() {
 }
 
 void ofApp::drawPointCloud() {
-	int w = 640;
+	
+    int w = 640;
 	int h = 480;
 	ofMesh mesh;
 	mesh.setMode(OF_PRIMITIVE_POINTS);
+	//mesh.setMode(OF_PRIMITIVE_TRIANGLES);
+    //mesh.setMode( OF_PRIMITIVE_TRIANGLE_STRIP );
+    
 	int step = 2;
     
     float mind = cloudThresholdMin;
@@ -226,7 +230,7 @@ void ofApp::drawPointCloud() {
 		for(int x = 0; x < w; x += step) {
 			
             float dist = kinect.getDistanceAt(x, y) ; 
-            if( dist > 0 ) {
+            if( dist < maxd && dist > mind ) {
                 
                 ofVec3f point = kinect.getWorldCoordinateAt(x, y);
                 point.x += ofRandom(-distortion, distortion);
@@ -245,7 +249,8 @@ void ofApp::drawPointCloud() {
 	ofScale(1, -1, -1);
 	ofTranslate(0, 0, -1000); // center the points a bit
 	ofEnableDepthTest();
-	mesh.drawVertices();
+	//mesh.drawVertices();
+	mesh.drawWireframe();
 	ofDisableDepthTest();
 	ofPopMatrix();
 }
