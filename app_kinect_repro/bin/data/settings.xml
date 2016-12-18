@@ -1,0 +1,13 @@
+<group>
+	<kinect_contours>
+		<nearThresh>255</nearThresh>
+		<farThresh>105.708</farThresh>
+		<minArea>1000</minArea>
+		<maxArea>119005</maxArea>
+		<threshold>21.7092</threshold>
+		<persistence>15</persistence>
+		<maxDistance>100</maxDistance>
+	</kinect_contours>
+<group/>
+<kinect_testing_img>1</kinect_testing_img>
+</group>

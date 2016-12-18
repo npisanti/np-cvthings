@@ -27,6 +27,9 @@ class ofApp : public ofBaseApp{
         
         ofxPanel                gui;
         np::ContoursOperations  contop;
+        np::ContoursJitter      contjit;
         vector<ofPolyline>      contours;
         int                     index;
+        int                     selector;
+        bool                    bDrawGui;
 };

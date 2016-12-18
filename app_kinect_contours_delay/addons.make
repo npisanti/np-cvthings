@@ -1,0 +1,5 @@
+ofxGui
+ofxCv
+ofxKinect
+ofxKinectProjectorToolkit
+np-cvthings

@@ -5,11 +5,15 @@ void ofApp::setup(){
     ofSetWindowTitle("contours operations");
     gui.setup("", "settings.xml");
     gui.add( contop.ui );
+    gui.add( contjit.ui );
+    selector = 0;
+    bDrawGui = true;
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     contop.update( contours );
+    contjit.update( contop.contours );
 }
 
 //--------------------------------------------------------------
@@ -17,13 +21,24 @@ void ofApp::draw(){
 
     ofBackground(0);
         
-    gui.draw();
-    
-    ofSetColor( 255, 0, 0);
-    for( auto & cont : contours) cont.draw();
-    
-    ofSetColor( 255, 90, 90 );
-    for( auto & cont : contop.contours) cont.draw();
+    switch (selector){
+        
+        case 0:    
+            ofSetColor( 255, 0, 0);
+            for( auto & cont : contours) cont.draw();
+            
+            ofSetColor( 255, 90, 90 );
+            for( auto & cont : contjit.contours) cont.draw();
+        break;
+        
+        case 1:
+            // another configuration
+            
+        break;
+        
+    }
+
+    if(bDrawGui) gui.draw();
     
 }
 
@@ -34,9 +49,22 @@ void ofApp::exit(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+    
     switch(key){
-        case ' ': contours.clear();
+        case ' ': 
+            contours.clear();
+            break;
+            
+        case 'g':
+            bDrawGui = bDrawGui ? false : true;
+            break;
+    
+        case OF_KEY_TAB:
+            selector++;
+            if(selector==1) selector = 0;
+        break;
     }
+    
 }
 
 //--------------------------------------------------------------
@@ -45,7 +73,6 @@ void ofApp::mousePressed(int x, int y, int button){
     contours.resize(index+1);
     contours[index].clear();
     contours[index].addVertex(x, y);
-    
 }
 
 void ofApp::mouseDragged(int x, int y, int button){

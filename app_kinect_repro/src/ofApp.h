@@ -29,5 +29,9 @@ public:
     ofColor                     blobColors[12];
     
     np::CalibratedKinectContours krepro;
+        
+    vector<ofPolyline> contours;
+    
+    ofParameter<bool> bAlphaTest;
     
 };

@@ -6,6 +6,7 @@
 #include "ofxCv.h"
 #include "ofxKinect.h"
 #include "ofxKinectProjectorToolkit.h"
+#include <atomic>
 
 namespace np{
 
@@ -14,25 +15,28 @@ class CalibratedKinectContours : public ofThread {
 public:
 
     CalibratedKinectContours();
-    void setup( int projectorW, int projectorH, string calibrationXmlPath, int usec=250 );
+    void setup( int projectorW, int projectorH, string calibrationXmlPath, int msec=5 );
     void exit();
     
     void threadedFunction();
 
-    ofParameterGroup    ui;
-    ofxKinect           kinect;
-    
-    const vector<ofPolyline> & getContours();
-    
+    ofParameterGroup            ui;
+    bool                        hasNewContours();
+    const vector<ofPolyline> &  getContours();
+
+    void drawTestingImage( int x, int y );
+
 private:
 
-    ofxCv::ContourFinder        contourFinder;
+    ofxKinect                   kinect;    
     ofxKinectProjectorToolkit   kpt;
-
+    
     ofxCvGrayscaleImage         bgImage;
     ofxCvGrayscaleImage         grayImage;
     ofxCvGrayscaleImage         grayThreshNear;
     ofxCvGrayscaleImage         grayThreshFar;
+
+    ofxCv::ContourFinder        contourFinder;
 
     ofParameter<float>          nearThreshold;
     ofParameter<float>          farThreshold;
@@ -48,7 +52,9 @@ private:
     
     int projectorH;
     int projectorW;
-    int usec;
+    int msec;
+    
+    atomic<bool>                bNew;
 };
 
 }

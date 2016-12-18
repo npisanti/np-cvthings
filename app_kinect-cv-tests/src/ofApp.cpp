@@ -173,7 +173,7 @@ void ofApp::keyPressed (int key) {
 	switch (key) {			
 
         case 's':
-            ofSaveScreen("screnshot-" + ofToString(ofGetFrameNum()) + ".jpg");
+            ofSaveScreen("screenshot-" + ofToString(ofGetFrameNum()) + ".jpg");
         break;
 
 		case OF_KEY_UP:

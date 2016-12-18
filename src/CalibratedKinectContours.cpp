@@ -15,12 +15,14 @@ np::CalibratedKinectContours::CalibratedKinectContours(){
     
     toReturn.clear();
     
-    usec = 250;
+    msec = 250;
+    
+    bNew = false;
 }
 
-void np::CalibratedKinectContours::setup( int projectorW, int projectorH, string calibrationXmlPath, int usec) {
+void np::CalibratedKinectContours::setup( int projectorW, int projectorH, string calibrationXmlPath, int msec) {
     
-    this->usec = usec; 
+    this->msec = msec; 
     this->projectorH = projectorH;
     this->projectorW = projectorW;
     
@@ -36,8 +38,8 @@ void np::CalibratedKinectContours::setup( int projectorW, int projectorH, string
     kpt.loadCalibration( calibrationXmlPath );
 
     startThread();
-}
 
+}
 
 void np::CalibratedKinectContours::threadedFunction() {
     
@@ -46,6 +48,9 @@ void np::CalibratedKinectContours::threadedFunction() {
         kinect.update();
         
         if(kinect.isFrameNew()) {
+
+            contoursMutex.lock();
+            
             // process kinect depth image
             grayImage.setFromPixels(kinect.getDepthPixels().getData(), kinect.width, kinect.height);
             grayThreshNear = grayImage;
@@ -65,8 +70,6 @@ void np::CalibratedKinectContours::threadedFunction() {
             // determine found contours
             contourFinder.findContours(grayImage);
             
-            contoursMutex.lock();
-            
             contours.resize( contourFinder.size() );
                 
                 for(int i = 0; i < contourFinder.size(); i++) {
@@ -80,23 +83,41 @@ void np::CalibratedKinectContours::threadedFunction() {
                         contours[i].addVertex( projectorW * projectedPoint.x, projectorH * projectedPoint.y );
                     }
                 }
-                
+            
+            bNew = true;           
+                      
             contoursMutex.unlock();
             
         }
-        usleep( usec );
+        sleep( msec );
     }
 }    
 
 
 void np::CalibratedKinectContours::exit() {
-    stopThread();
+    contoursMutex.lock();
+        stopThread();
+    contoursMutex.unlock();
 }
+
+
+bool np::CalibratedKinectContours::hasNewContours() {
+    return bNew;
+}
+
 
 const vector<ofPolyline> & np::CalibratedKinectContours::getContours() {
     contoursMutex.lock();
     toReturn = contours;
     contoursMutex.unlock();
+    bNew = false;
     return toReturn;
+}
+
+
+void np::CalibratedKinectContours::drawTestingImage( int x, int y ) {
+    contoursMutex.lock();
+        grayImage.draw(x, y);
+    contoursMutex.unlock();
 }
 
