@@ -14,13 +14,13 @@ void np::ContoursBuffer::push( const vector<ofPolyline> & newContours ) {
     buffer[index] = newContours;
 }
 
-const vector<ofPolyline> & np::ContoursBuffer::delay(int i) {
+const vector<ofPolyline> & np::ContoursBuffer::delay(int i) const {
     int n = index - i;
     while( n  < 0 ) n += bufferSize;
     return buffer[n];
 }
 
 
-const vector<ofPolyline> & np::ContoursBuffer::now() {
+const vector<ofPolyline> & np::ContoursBuffer::now() const {
     return buffer[index];
 }

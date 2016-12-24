@@ -61,7 +61,9 @@ void np::ThresholdMasker::setup (int w, int h, int destW, int destH ){
 void np::ThresholdMasker::update( const ofPixels & pixels ) {
         tImage.setFromPixels( pixels );
         ofxCv::threshold(tImage, t);
+        
 		tImage.update();
+        tImage.mirror( false, true ); // mirrors image <<---------------------------------
         
         if(bResize){
             mask.begin();

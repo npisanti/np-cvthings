@@ -8,3 +8,4 @@
 #include "ContoursJitter.h"
 #include "ContoursBuffer.h"
 #include "CalibratedKinectContours.h"
+#include "DelayOperations.h"

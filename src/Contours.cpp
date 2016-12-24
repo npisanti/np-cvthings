@@ -29,15 +29,16 @@ void np::Contours::setup( int w, int h, int destW, int destH) {
     ui.add( smoothOuter.set("smoothing outer", 40, 1, 100) );
     ui.add( contoursSeparation.set("contours separation", 100, 5, 300));
     ui.add( bContourMode.set("outer mode", true));
-    
+    ui.add( bFindHoles.set("holes", false) );
     contourFinder.setThreshold( 0 );
-    contourFinder.setFindHoles( false );
+
     contours.reserve( 10 );
     outer.reserve( 10 );
 }
 
 void np::Contours::update( ofImage & tImage ) {
-   
+
+    contourFinder.setFindHoles( bFindHoles );   
     contourFinder.setMinAreaRadius(minArea);
     contourFinder.setMaxAreaRadius(maxArea);
     contourFinder.findContours( tImage );

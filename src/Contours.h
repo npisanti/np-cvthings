@@ -31,7 +31,7 @@ private:
     ofParameter<bool> bSmoothInner;
     ofParameter<bool> bContourMode;
     ofParameter<int> contoursSeparation;
-
+    ofParameter<bool> bFindHoles;
 
     float scaleX;
     float scaleY;
