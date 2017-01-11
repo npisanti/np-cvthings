@@ -13,8 +13,13 @@ public:
     const vector<ofPolyline> & delay(int i) const; 
     const vector<ofPolyline> & now() const;
     
+    ofParameterGroup ui;
+    
     
 private:
+    ofParameter<bool> bSimplify;
+    ofParameter<float> simplifyAmount;
+    
     vector<vector<ofPolyline>> buffer;
     std::mutex bufferLock;
 

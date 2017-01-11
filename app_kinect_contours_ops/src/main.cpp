@@ -3,8 +3,8 @@
 int main() {
     
 	ofGLWindowSettings settings;
-	settings.width = 640 + 320;
-    settings.height = 480 + 240;
+	settings.width = 1024;
+    settings.height = 768;
     settings.setGLVersion(3,2);
 	ofCreateWindow(settings);
     

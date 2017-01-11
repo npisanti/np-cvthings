@@ -3,3 +3,8 @@ ofxCv
 ofxKinect
 ofxKinectProjectorToolkit
 np-cvthings
+np-junkrepo
+ofxPDSP
+ofxOsc
+ofxMidi
+ofxSIMDFloats

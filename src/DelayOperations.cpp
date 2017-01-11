@@ -10,6 +10,9 @@ np::DelayOperations::DelayOperations( ) {
 
     ui.setName( "delay ops n" + ofToString(++number) );
 
+    ui.add( delayFrames.set("delay frames", 12, 1, 60) );
+    ui.add( numDelays.set("num delays", 3, 1, 5) );
+
     ui.add( bSmoothPre.set("smooth", true) );
     ui.add( smoothPre.set("smoothing px", 5, 1, 50) );
     ui.add( smoothPreMod.set("smoothing MOD", 0, -50, 50) );
@@ -30,19 +33,19 @@ np::DelayOperations::DelayOperations( ) {
     ui.add( jitYMod.set( "jit y mod", 0, -100, 100) );
     
     buffer.resize( 10 );
-    //buffer.clear();
 
 }
 
-void np::DelayOperations::update( const ContoursBuffer & cBuffer, int num, int delay  ) {
+void np::DelayOperations::update( const ContoursBuffer & cBuffer ) {
 
-    t = num;
-    for (int i=0; i<num; ++i){
-        buffer[i] = cBuffer.delay( i*delay );
+    t = numDelays;
+    
+    for (size_t i=0; i<t; ++i){
+        buffer[i] = cBuffer.delay( i*delayFrames );
     }
 
     if( bSmoothPre ){
-        for ( size_t n = 0; n<num; ++n ) {
+        for ( size_t n = 0; n<t; ++n ) {
             for (size_t i=0; i<buffer[n].size(); i++) {
                 buffer[n][i] = buffer[n][i].getSmoothed( smoothPre + smoothPreMod*n, smoothMode );
             }                
@@ -50,7 +53,7 @@ void np::DelayOperations::update( const ContoursBuffer & cBuffer, int num, int d
     }
     
     if( bExpand ){
-        for ( size_t n=0; n<num; ++n ) {
+        for ( size_t n=0; n<t; ++n ) {
             for(size_t i=0; i<buffer[n].size(); ++i ){
                 
                 vector<ofPoint> & vertices = buffer[n][i].getVertices();
@@ -75,15 +78,12 @@ void np::DelayOperations::update( const ContoursBuffer & cBuffer, int num, int d
                         buffer[n][i] = buffer[n][i].getSmoothed( smoothPost, smoothMode );
                     }        
                 }
-                
-
-                
             }
         }
     }
     
     if( bJitter ){
-        for ( size_t n=0; n<num; ++n ) {
+        for ( size_t n=0; n<t; ++n ) {
             
             int jx = jitX + jitXMod*n;
             int jy = jitY + jitYMod*n;
