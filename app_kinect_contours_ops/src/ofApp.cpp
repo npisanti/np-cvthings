@@ -40,9 +40,13 @@ void ofApp::setup() {
     
     bDrawGui = true;
 
- 
-    color = ofColor( 255, 70, 200);
+
+    colors.resize(4);
     
+    colors[0] = ofColor( 255, 70, 200);
+    colors[1] = ofColor( 255, 200, 70);
+    colors[2] = ofColor( 255, 85, 85);
+    colors[3] = ofColor( 225, 20, 20 );
 }
 
 
@@ -69,14 +73,30 @@ void ofApp::update() {
                 int min = 1;
                 if( bDrawFirstContour ) min = 0;
                 int fillStep = fillAlphaStart / (delayop.size()+1);
+                
+                // older delays have a darker color
                 for ( int i=delayop.size()-1; i>=min; --i ){
-                    ofSetColor( fillAlphaStart - i*fillStep );
-                    drawPolylines( delayop.buffer[i] );                      
+                    ofSetColor( fillAlphaStart - i*fillStep );  
+                    for( auto & cont : delayop.buffer[i] ) {                    
+                        drawPolyline(cont.contour);
+                    }                 
                 }
+                ofSetColor(0);
+                
             masker.mask.end();
             
             masker.canvas.begin();
-                ofClear( color );
+                ofClear( 0 );
+                ofFill();
+                // so each contour has its own color
+                for ( int i=delayop.size()-1; i>=0; --i ){
+                    for( auto & cont : delayop.buffer[i] ) {   
+                        int index = cont.label % colors.size();
+                        ofSetColor( colors[index], 255 );
+                        ofDrawRectangle( cont.contour.getBoundingBox() );
+                    }         
+                }
+
             masker.canvas.end();     
                       
         }
@@ -92,7 +112,7 @@ void ofApp::draw() {
     
     if(colorizeBackground){
         ofFill();
-        ofSetColor( color, backgroundAlpha );
+        ofSetColor( colors[0], backgroundAlpha );
         ofDrawRectangle( 0, 0, ofGetWidth(), ofGetHeight() );                
     }
 
@@ -101,18 +121,33 @@ void ofApp::draw() {
     }
 
     for ( int i=delayop.size()-1; i>=0; --i ){
+        
         if( i==0){
             if(bBlackNow){
                 ofSetColor(0);
                 ofFill();
-                drawPolylines( delayop.buffer[0] ); 
-            }            
+                for( auto & cont : delayop.buffer[0] ) {                    
+                    drawPolyline(cont.contour);
+                }  
+            }        
+
+            for( auto & cont : delayop.buffer[0] ) {   
+                
+                ofPoint center = cont.contour.getCentroid2D();   
+                int index = cont.label % colors.size();
+                ofSetColor( colors[index] );    
+                ofDrawBitmapString( "id " + ofToString(cont.label), center.x, center.y );   
+            }  
+
         }
         
         if( (bDrawContours && i>0) || (i==0 && bDrawFirstContour) ){
-            ofSetColor( color, contoursAlphaStart - i*alphaStep );
             ofNoFill();
-            drawPolylines( delayop.buffer[i] );
+            for( auto & cont : delayop.buffer[i] ){
+                int index = cont.label % colors.size();
+                ofSetColor( colors[index], contoursAlphaStart - i*alphaStep );
+                drawPolyline(cont.contour);
+            }    
         }
     }    
     
@@ -121,12 +156,14 @@ void ofApp::draw() {
     }         
 }
 
-void ofApp::drawPolylines( const vector<ofPolyline> & polylines ) {
+void ofApp::drawPolylines( const vector<np::CvContour> & contours, int alpha ) {
     
-    for( auto & cont : polylines ){
+    for( auto & cont : contours ){
+        int index = cont.label % colors.size();
+        ofSetColor( colors[index], alpha );
         
         ofBeginShape();
-            const vector<ofPoint> & vertices =  cont.getVertices();
+            const vector<ofPoint> & vertices =  cont.contour.getVertices();
             int max = vertices.size();
             if(max>0){
                 for ( size_t i=0; i<max; ++i ){
@@ -135,6 +172,20 @@ void ofApp::drawPolylines( const vector<ofPolyline> & polylines ) {
             }
         ofEndShape();
     }    
+    
+}
+
+void ofApp::drawPolyline( const ofPolyline & line ) {
+    
+    ofBeginShape();
+        const vector<ofPoint> & vertices =  line.getVertices();
+        int max = vertices.size();
+        if(max>0){
+            for ( size_t i=0; i<max; ++i ){
+                ofVertex( vertices[i].x, vertices[i].y );
+            }
+        }
+    ofEndShape();
     
 }
 

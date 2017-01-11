@@ -28,15 +28,17 @@
 		</contours>
 	<kinect_contours>
 			<nearThresh>255</nearThresh>
-			<farThresh>196.454</farThresh>
+			<farThresh>204.26</farThresh>
 			<minArea>1173.47</minArea>
 			<maxArea>114872</maxArea>
 			<finder_thresh>15</finder_thresh>
 			<find_holes>0</find_holes>
+		<tracker_persistence>87.8775</tracker_persistence>
+			<tracker_maxDistance>100</tracker_maxDistance>
 		</kinect_contours>
 		<contours_buffer>
-			<simplify>0</simplify>
-			<tolerance>0</tolerance>
+			<simplify>1</simplify>
+			<tolerance>1</tolerance>
 		</contours_buffer>
 		<delay_ops_n1>
 			<delay_frames>20</delay_frames>
@@ -52,8 +54,8 @@
 			<post_smooth>0</post_smooth>
 			<post_smoothing_px>15</post_smoothing_px>
 			<jitter_ops>0</jitter_ops>
-			<jitter_x>0</jitter_x>
-			<jit_x_mod>0</jit_x_mod>
+			<jitter_x>4</jitter_x>
+			<jit_x_mod>11</jit_x_mod>
 			<jitter_y>0</jitter_y>
 			<jit_y_mod>0</jit_y_mod>
 		</delay_ops_n1>

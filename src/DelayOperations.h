@@ -3,6 +3,7 @@
 
 #include "ofMain.h"
 #include "ContoursBuffer.h"
+#include "CvContour.h"
 
 namespace np{
 
@@ -13,7 +14,7 @@ public:
 
     void update( const ContoursBuffer & cBuffer );
     
-    vector<vector<ofPolyline>>  buffer;
+    vector<vector<CvContour>>  buffer;
     const size_t size()         const;
 
     ofParameterGroup    ui;

@@ -6,6 +6,7 @@
 #include "ofxCv.h"
 #include "ofxKinect.h"
 #include <atomic>
+#include "CvContour.h"
 
 namespace np{
 
@@ -21,7 +22,7 @@ public:
 
     ofParameterGroup            ui;
     bool                        hasNewContours();
-    const vector<ofPolyline> &  getContours();
+    const vector<CvContour> &   getContours();
 
     void drawTestingImage( int x, int y );
 
@@ -42,12 +43,15 @@ private:
     ofParameter<float>          minArea;
     ofParameter<float>          maxArea;
     ofParameter<float>          threshold;
-    //ofParameter<float>          persistence;
-    //ofParameter<float>          maxDistance;
+    ofParameter<float>          persistence;
+    ofParameter<float>          maxDistance;
     ofParameter<bool>           bHoles;
     
-    vector<ofPolyline>          contours;
-    vector<ofPolyline>          toReturn;
+    
+    vector<vector<CvContour>>   circularBuffer;
+    size_t                      circularIndex;
+    size_t                      circularMax;
+
     std::mutex                  contoursMutex;
     
     int screenW;

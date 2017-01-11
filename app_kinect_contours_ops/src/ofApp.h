@@ -16,7 +16,8 @@ public:
 	void keyPressed(int key);
     void exit();
     
-    void drawPolylines( const vector<ofPolyline> & polylines );
+    void drawPolylines( const vector<np::CvContour> & contours, int alpha );
+    void drawPolyline( const ofPolyline & line );
 
     np::KinectContours      kContours;
     np::ContoursBuffer      buffer;
@@ -39,6 +40,7 @@ public:
     
     int     angle;
     int     alphaStep;
-    ofColor color;
+    
+    vector<ofColor> colors;
     
 };

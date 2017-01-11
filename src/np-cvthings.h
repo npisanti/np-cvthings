@@ -10,3 +10,4 @@
 #include "CalibratedKinectContours.h"
 #include "KinectContours.h"
 #include "DelayOperations.h"
+#include "CvContour.h"

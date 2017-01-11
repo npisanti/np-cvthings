@@ -47,7 +47,7 @@ void np::DelayOperations::update( const ContoursBuffer & cBuffer ) {
     if( bSmoothPre ){
         for ( size_t n = 0; n<t; ++n ) {
             for (size_t i=0; i<buffer[n].size(); i++) {
-                buffer[n][i] = buffer[n][i].getSmoothed( smoothPre + smoothPreMod*n, smoothMode );
+                buffer[n][i].contour = buffer[n][i].contour.getSmoothed( smoothPre + smoothPreMod*n, smoothMode );
             }                
         }
     }
@@ -56,10 +56,10 @@ void np::DelayOperations::update( const ContoursBuffer & cBuffer ) {
         for ( size_t n=0; n<t; ++n ) {
             for(size_t i=0; i<buffer[n].size(); ++i ){
                 
-                vector<ofPoint> & vertices = buffer[n][i].getVertices();
+                vector<ofPoint> & vertices = buffer[n][i].contour.getVertices();
                 
                 if( bExpandMode ){
-                    ofPoint center = buffer[n][i].getCentroid2D();
+                    ofPoint center = buffer[n][i].contour.getCentroid2D();
                     for (int vertexIndex=0; vertexIndex<vertices.size(); vertexIndex++) {
                         ofPoint difference = vertices[vertexIndex] - center;
                         ofPoint outside = difference.getNormalized();
@@ -68,14 +68,14 @@ void np::DelayOperations::update( const ContoursBuffer & cBuffer ) {
                     }
                 }else{
                     for (int vertexIndex=0; vertexIndex<vertices.size(); vertexIndex++) {
-                        ofPoint normal = buffer[n][i].getNormalAtIndex(vertexIndex) * (expand + expandMod*n);  // Scale the normal
+                        ofPoint normal = buffer[n][i].contour.getNormalAtIndex(vertexIndex) * (expand + expandMod*n);  // Scale the normal
                         vertices[vertexIndex] = vertices[vertexIndex] + normal;
                     }
                 }
                 
                 if( bSmoothPost ){
                     for (size_t i=0; i<buffer[n].size(); i++) {
-                        buffer[n][i] = buffer[n][i].getSmoothed( smoothPost, smoothMode );
+                        buffer[n][i].contour = buffer[n][i].contour.getSmoothed( smoothPost, smoothMode );
                     }        
                 }
             }
@@ -89,7 +89,7 @@ void np::DelayOperations::update( const ContoursBuffer & cBuffer ) {
             int jy = jitY + jitYMod*n;
             
             for(size_t i=0; i<buffer[n].size(); ++i ){                
-                vector<ofPoint> & vertices = buffer[n][i].getVertices();
+                vector<ofPoint> & vertices = buffer[n][i].contour.getVertices();
 
                 for (int vertexIndex=0; vertexIndex<vertices.size(); vertexIndex++) {
                     vertices[vertexIndex].x += ofRandom( -jx, jx );
