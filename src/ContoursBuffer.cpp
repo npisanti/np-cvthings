@@ -3,7 +3,8 @@
 
 void np::ContoursBuffer::setup( int bufferSize ) {
     this->bufferSize = bufferSize;
-    index = 0;
+    readIndex = 0;
+    writeIndex = 0;
     buffer.resize( bufferSize );
     ui.setName( "contours buffer");
     ui.add( bSimplify.set("simplify", false) );
@@ -12,26 +13,27 @@ void np::ContoursBuffer::setup( int bufferSize ) {
 
 
 void np::ContoursBuffer::push( const vector<np::CvContour> & newContours ) {
-    index++;
-    index = (index==bufferSize) ? 0 : index;
+    writeIndex++;
+    writeIndex = (writeIndex==bufferSize) ? 0 : writeIndex;
 
-    buffer[index] = newContours;  
+    buffer[writeIndex] = newContours;  
     
     if( bSimplify ) {
-        for( size_t i=0; i<buffer[index].size(); ++i ) {
-            buffer[index][i].contour.simplify( simplifyAmount );
+        for( size_t i=0; i<buffer[writeIndex].size(); ++i ) {
+            buffer[writeIndex][i].contour.simplify( simplifyAmount );
         }
     }
+    readIndex = writeIndex;
 
 }
 
 const vector<np::CvContour> & np::ContoursBuffer::delay(int i) const {
-    int n = index - i;
+    int n = readIndex - i;
     while( n  < 0 ) n += bufferSize;
     return buffer[n];
 }
 
 
 const vector<np::CvContour> & np::ContoursBuffer::now() const {
-    return buffer[index];
+    return buffer[readIndex];
 }

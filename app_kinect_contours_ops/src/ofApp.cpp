@@ -13,18 +13,24 @@ void ofApp::setup() {
     int pw = ofGetWidth();
     int ph = ofGetHeight();
     
-    kContours.setup( pw, ph );
-    buffer.setup( 400 );
+    fbo.allocate( pw, ph );
+    fbo.begin();
+        ofClear(0, 0, 0, 0);
+    fbo.end();
+    
+    kBuffer.setup( 512, pw, ph );
     masker.setup( ofGetWidth(), ofGetHeight() );
     
     // -------------- contour finder setup -------------
     gui.setup("", "settings.xml", ofGetWidth()-220, 20 );
     gui.setName("SETTINGS");
-    gui.add( kContours.ui );
-    gui.add( buffer.ui );
-    gui.add( delayop.ui );
+    gui.add( delayFrames.set("delay frames", 12, 1, 60) );
+    gui.add( numDelays.set("num delays", 3, 1, 5) );
+
+    gui.add( kBuffer.ui );
+    gui.add( ops.ui );
     
-    graphics.setName("graphics options");    
+    graphics.setName("app graphics");    
     graphics.add( bDelayFill.set("delay fill", false) );
     graphics.add( fillAlphaStart.set("fill alpha start", 255, 0, 255));
     graphics.add( bBlackNow.set("black fill first", false));
@@ -55,14 +61,15 @@ void ofApp::update() {
     
     ofSetWindowTitle( "fps: " + ofToString( ofGetFrameRate() ) );
 
-	// there is a new frame and we are connected
-	if(kContours.hasNewContours()) {    
+	// there is a new contour and we are connected
+	if( kBuffer.update() ) {    
         
-        buffer.push( kContours.getContours() );
-
-        delayop.update( buffer );
-
-        alphaStep = contoursAlphaStart / (delayop.size()+1);    
+        for( size_t i=0; i<numDelays; ++i ){
+            ops.update( i, kBuffer.delay(i, delayFrames) );
+        }
+        
+        // -------------------- UPDATE YOUR GRAPHICS HERE -----------------
+        alphaStep = contoursAlphaStart / (numDelays+1);    
 
         if( bDelayFill ){
             
@@ -72,12 +79,12 @@ void ofApp::update() {
                 
                 int min = 1;
                 if( bDrawFirstContour ) min = 0;
-                int fillStep = fillAlphaStart / (delayop.size()+1);
+                int fillStep = fillAlphaStart / (numDelays+1);
                 
                 // older delays have a darker color
-                for ( int i=delayop.size()-1; i>=min; --i ){
+                for ( int i=numDelays-1; i>=min; --i ){
                     ofSetColor( fillAlphaStart - i*fillStep );  
-                    for( auto & cont : delayop.buffer[i] ) {                    
+                    for( auto & cont : ops.buffer[i] ) {                    
                         drawPolyline(cont.contour);
                     }                 
                 }
@@ -89,90 +96,66 @@ void ofApp::update() {
                 ofClear( 0 );
                 ofFill();
                 // so each contour has its own color
-                for ( int i=delayop.size()-1; i>=0; --i ){
-                    for( auto & cont : delayop.buffer[i] ) {   
-                        int index = cont.label % colors.size();
-                        ofSetColor( colors[index], 255 );
+                for ( int i=numDelays-1; i>=0; --i ){
+                    for( auto & cont : ops.buffer[i] ) {   
+                        ofSetColor( getLabelColor(cont), 255 );
                         ofDrawRectangle( cont.contour.getBoundingBox() );
                     }         
                 }
 
             masker.canvas.end();     
-                      
         }
 
-    }
-
-}
-
-//--------------------------------------------------------------
-void ofApp::draw() {
-
-    ofBackground(0);  
-    
-    if(colorizeBackground){
-        ofFill();
-        ofSetColor( colors[0], backgroundAlpha );
-        ofDrawRectangle( 0, 0, ofGetWidth(), ofGetHeight() );                
-    }
-
-    if( bDelayFill ){
-        masker.draw(0, 0);
-    }
-
-    for ( int i=delayop.size()-1; i>=0; --i ){
-        
-        if( i==0){
-            if(bBlackNow){
-                ofSetColor(0);
+        fbo.begin();
+            ofClear(0, 0, 0, 255);
+            
+            if(colorizeBackground){
                 ofFill();
-                for( auto & cont : delayop.buffer[0] ) {                    
-                    drawPolyline(cont.contour);
-                }  
-            }        
+                ofSetColor( colors[0], backgroundAlpha );
+                ofDrawRectangle( 0, 0, ofGetWidth(), ofGetHeight() );                
+            }
 
-            for( auto & cont : delayop.buffer[0] ) {   
+            if( bDelayFill ){
+                masker.draw(0, 0);
+            }
+
+            for ( int i=numDelays-1; i>=0; --i ){
                 
-                ofPoint center = cont.contour.getCentroid2D();   
-                int index = cont.label % colors.size();
-                ofSetColor( colors[index] );    
-                ofDrawBitmapString( "id " + ofToString(cont.label), center.x, center.y );   
-            }  
+                if( i==0){
+                    if(bBlackNow){
+                        ofSetColor(0);
+                        ofFill();
+                        for( auto & cont : ops.buffer[0] ) {                    
+                            drawPolyline(cont.contour);
+                        }  
+                    }        
 
-        }
-        
-        if( (bDrawContours && i>0) || (i==0 && bDrawFirstContour) ){
-            ofNoFill();
-            for( auto & cont : delayop.buffer[i] ){
-                int index = cont.label % colors.size();
-                ofSetColor( colors[index], contoursAlphaStart - i*alphaStep );
-                drawPolyline(cont.contour);
+                    for( auto & cont : ops.buffer[0] ) {   
+                        
+                        ofPoint center = cont.contour.getCentroid2D();   
+                        ofSetColor( getLabelColor(cont) );    
+                        ofDrawBitmapString( "id " + ofToString(cont.label), center.x, center.y );   
+                    }  
+
+                }
+                
+                if( (bDrawContours && i>0) || (i==0 && bDrawFirstContour) ){
+                    ofNoFill();
+                    for( auto & cont : ops.buffer[i] ){
+                        ofSetColor( getLabelColor(cont), contoursAlphaStart - i*alphaStep );
+                        drawPolyline(cont.contour);
+                    }    
+                }
             }    
-        }
-    }    
-    
-    if(bDrawGui){
-        gui.draw();
-    }         
+        fbo.end();
+
+    }
+
 }
 
-void ofApp::drawPolylines( const vector<np::CvContour> & contours, int alpha ) {
-    
-    for( auto & cont : contours ){
-        int index = cont.label % colors.size();
-        ofSetColor( colors[index], alpha );
-        
-        ofBeginShape();
-            const vector<ofPoint> & vertices =  cont.contour.getVertices();
-            int max = vertices.size();
-            if(max>0){
-                for ( size_t i=0; i<max; ++i ){
-                    ofVertex( vertices[i].x, vertices[i].y );
-                }
-            }
-        ofEndShape();
-    }    
-    
+const ofColor & ofApp::getLabelColor( const np::CvContour & cont ) const {
+    int index = cont.label % colors.size();
+    return colors[index];
 }
 
 void ofApp::drawPolyline( const ofPolyline & line ) {
@@ -190,20 +173,30 @@ void ofApp::drawPolyline( const ofPolyline & line ) {
 }
 
 //--------------------------------------------------------------
+void ofApp::draw() {
+
+    ofBackground(0);  
+    fbo.draw(0, 0);
+    
+    if(bDrawGui){
+        gui.draw();
+    }         
+}
+
+//--------------------------------------------------------------
 void ofApp::keyPressed (int key) {
 
 	switch (key) {			
-    
 		case OF_KEY_UP:
 			angle++;
 			if(angle>30) angle=30;
-			kContours.kinect.setCameraTiltAngle(angle);
+			kBuffer.kinect.setCameraTiltAngle(angle);
 			break;
 			
 		case OF_KEY_DOWN:
 			angle--;
 			if(angle<-30) angle=-30;
-			kContours.kinect.setCameraTiltAngle(angle);
+			kBuffer.kinect.setCameraTiltAngle(angle);
 			break;
 
         case 'g' :
@@ -215,5 +208,5 @@ void ofApp::keyPressed (int key) {
 
 //--------------------------------------------------------------
 void ofApp::exit() {
-    kContours.exit();
+    kBuffer.exit();
 }

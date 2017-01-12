@@ -24,7 +24,8 @@ private:
     vector<vector<CvContour>> buffer;
     std::mutex bufferLock;
 
-    int index; 
+    int writeIndex;
+    int readIndex; 
     int bufferSize;
 };    
     

@@ -9,5 +9,7 @@
 #include "ContoursBuffer.h"
 #include "CalibratedKinectContours.h"
 #include "KinectContours.h"
+#include "KinectContoursBuffer.h"
 #include "DelayOperations.h"
+#include "BufferedOperations.h"
 #include "CvContour.h"

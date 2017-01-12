@@ -16,17 +16,19 @@ public:
 	void keyPressed(int key);
     void exit();
     
-    void drawPolylines( const vector<np::CvContour> & contours, int alpha );
+    const ofColor & getLabelColor( const np::CvContour & cont ) const;
     void drawPolyline( const ofPolyline & line );
 
-    np::KinectContours      kContours;
-    np::ContoursBuffer      buffer;
-    np::DelayOperations     delayop;  
-    np::AlphaMasker         masker;
+    np::KinectContoursBuffer    kBuffer;
+    np::BufferedOperations      ops;
+    np::AlphaMasker             masker;
+    
+    ofParameter<int>            delayFrames;
+    ofParameter<int>            numDelays;
     
     ofParameterGroup            graphics;
         ofParameter<bool>           bDelayFill;
-        ofParameter<int>            numDelays;
+
         ofParameter<int>            contoursAlphaStart;
         ofParameter<int>            fillAlphaStart;
         ofParameter<bool>           bBlackNow;
@@ -42,5 +44,7 @@ public:
     int     alphaStep;
     
     vector<ofColor> colors;
+    
+    ofFbo   fbo;
     
 };
