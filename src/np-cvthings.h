@@ -1,15 +1,13 @@
 
 #pragma once
 
-#include "ThresholdMasker.h"
-#include "Difference.h"
-#include "Contours.h"
-#include "ContoursOperations.h"
-#include "ContoursJitter.h"
-#include "ContoursBuffer.h"
-#include "CalibratedKinectContours.h"
-#include "KinectContours.h"
-#include "KinectContoursBuffer.h"
-#include "DelayOperations.h"
-#include "BufferedOperations.h"
-#include "CvContour.h"
+#include "np-junkrepo.h"
+
+#include "cv/Contours.h"
+#include "cv/Difference.h"
+#include "cv/ThresholdMasker.h"
+
+#include "kinect/KinectContoursBuffer.h"
+#include "kinect/BufferedOperations.h"
+
+#include "contops/ContoursBuffer.h"

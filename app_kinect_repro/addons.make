@@ -1,6 +1,13 @@
-ofxCv
+ofxSvg
 ofxGui
+ofxOsc
+ofxMidi
+ofxOpenCv
+ofxCv
 ofxKinect
 ofxKinectProjectorToolkit
-ofxOpenCv
+ofxSIMDFloats
+ofxPDSP
+ofxHomography
+np-junkrepo
 np-cvthings

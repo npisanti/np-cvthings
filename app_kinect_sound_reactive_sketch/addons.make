@@ -1,3 +1,4 @@
+ofxSvg
 ofxKinect
 ofxOpenCv
 ofxGui

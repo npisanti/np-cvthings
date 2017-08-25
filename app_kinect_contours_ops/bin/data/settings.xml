@@ -110,7 +110,7 @@
 			<draw_1st_contours>1</draw_1st_contours>
 			<cont_alpha_start>255</cont_alpha_start>
 			<colorize_background>0</colorize_background>
-			<background_alpha>50</background_alpha>
+			<background_alpha>0</background_alpha>
 		</app_graphics>
 	</SETTINGS>
 </group>

@@ -6,7 +6,8 @@
 #include "ofxCv.h"
 #include "ofxKinect.h"
 #include <atomic>
-#include "CvContour.h"
+#include "np-junkrepo.h"
+#include "ofxKinectProjectorToolkit.h"
 
 namespace np{
 
@@ -15,7 +16,10 @@ class KinectContoursBuffer : public ofThread {
 public:
     KinectContoursBuffer();
     
-    void setup( int bufferSize, int screenW=640, int screenH=480 );
+    void setup( int bufferSize );
+    void setup( int bufferSize, int projectorW, int projectorH );
+    void setup( int bufferSize, int projectorW, int projectorH, string calibrationXmlPath  );
+    
     void exit();
     
     bool                        update();
@@ -26,6 +30,10 @@ public:
     ofxKinect                   kinect;   
     void                        drawTestingImage( int x, int y );
 
+    const ofImage &             difference() const;      
+    const vector<float> &       differenceCols() const;      
+    int                         getWidth();    
+    
 private:
     void threadedFunction();
     
@@ -43,9 +51,10 @@ private:
     ofParameter<float>          persistence;
     ofParameter<float>          maxDistance;
     ofParameter<bool>           bHoles;
-    
+
     ofParameter<bool>           bSimplify;
     ofParameter<float>          simplifyAmount;
+    ofParameter<bool>           bMirror;
      
     std::mutex                  contoursMutex;
     vector<vector<CvContour>>   buffer;
@@ -53,11 +62,27 @@ private:
     int                         writeIndex; 
     int                         readIndex; 
     int                         bufferSize;     
+       
+    int                         projectorW;
+    int                         projectorH;
+    int                         projectorOff;
+    int                         projectorX0;
+    int                         projectorX1;
+    void                        calculateAspect( int w, int h );
     
-    bool                        bExpand;     
-    int                         screenW;
-    int                         screenH;
     int                         msec;
+
+    vector<ofImage>             differenceBuffer;
+    vector<vector<float>>       differenceColumns;
+    ofPixels                    previous;
+    static const int            framediffMax = 5;
+    int                         diffRead;
+    int                         diffWrite;
+    cv::Mat                     columnMean;    
+
+    int                         translateMode;
+    ofxKinectProjectorToolkit   kpt;
+    
 };
 
 }

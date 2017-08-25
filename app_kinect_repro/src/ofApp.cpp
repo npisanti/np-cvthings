@@ -2,23 +2,10 @@
 
 void ofApp::setup() {
     ofSetVerticalSync(true);
-    ofSetWindowShape(1280, 960);
+    ofSetWindowShape(1280, 800);
     
-    blobColors[0] = ofColor(255, 0, 0);
-    blobColors[1] = ofColor(0, 255, 0);
-    blobColors[2] = ofColor(0, 0, 255);
-    blobColors[3] = ofColor(255, 255, 0);
-    blobColors[4] = ofColor(255, 0, 255);
-    blobColors[5] = ofColor(0, 255, 255);
-    blobColors[6] = ofColor(255, 127, 0);
-    blobColors[7] = ofColor(127, 0, 255);
-    blobColors[8] = ofColor(0, 255, 127);
-    blobColors[9] = ofColor(127, 255, 0);
-    blobColors[10]= ofColor(255, 0, 127);
-    blobColors[11]= ofColor(0, 127, 255);
-    
-    krepro.setup( PROJECTOR_RESOLUTION_X, PROJECTOR_RESOLUTION_Y,
-            "/home/nick/oF/addons/ofxKinectProjectorToolkit/calibration/bin/data/calibration.xml", 5 );
+    krepro.setup( 512,  PROJECTOR_RESOLUTION_X, PROJECTOR_RESOLUTION_Y,
+            "/home/nick/oF/addons/ofxKinectProjectorToolkit/calibration/bin/data/calibration.xml");
 
     gui.setup("parameters", "settings.xml", 1040, 20);    
     gui.add( krepro.ui );
@@ -29,7 +16,6 @@ void ofApp::setup() {
 
 void ofApp::update() {
     ofSetWindowTitle("kinect repro test, fps=" + ofToString( ofGetFrameRate()));
-    if(krepro.hasNewContours()) contours = krepro.getContours();
 }
 
 void ofApp::draw() {
@@ -42,22 +28,23 @@ void ofApp::draw() {
         krepro.drawTestingImage( 0, 0 );        
     }
 
-    for(int i = 0; i < contours.size(); i++) {
-        ofSetColor(blobColors[i % 12]);
-        contours[i].draw();
+    ofSetColor(0, 255, 255);
+    for(int i = 0; i < krepro.now().size(); i++) {
+        krepro.now()[i].draw();
     }
     
     gui.draw();
-    
 }
 
 void ofApp::drawSecondWindow(ofEventArgs &args){
     
     ofBackground(0);
-
-    for(int i = 0; i < contours.size(); i++) {
-        ofSetColor(blobColors[i % 12]);
-        contours[i].draw();
+    
+    ofFill();
+    ofSetColor(0, 255, 255);
+    
+    for(int i = 0; i < krepro.now().size(); i++) {
+        krepro.now()[i].draw();
     }
     
 }

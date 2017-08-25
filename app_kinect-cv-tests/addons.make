@@ -1,5 +1,0 @@
-ofxGui
-ofxCv
-ofxKinect
-np-cvthings
-ofxKinectProjectorToolkit

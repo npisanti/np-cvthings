@@ -19,12 +19,14 @@ void ofApp::setup() {
     fbo.end();
     
     kBuffer.setup( 512, pw, ph );
-    masker.setup( ofGetWidth(), ofGetHeight() );
+    //kBuffer.setup( 512, 720, 480, "/home/nick/oF/addons/ofxKinectProjectorToolkit/calibration/bin/data/calibration.xml");
+    
+    masker.setup( pw, ph );
     
     // -------------- contour finder setup -------------
     gui.setup("", "settings.xml", ofGetWidth()-220, 20 );
     gui.setName("SETTINGS");
-    gui.add( delayFrames.set("delay frames", 12, 1, 60) );
+    gui.add( delayFrames.set("delay frames", 12, 0, 60) );
     gui.add( numDelays.set("num delays", 3, 1, 5) );
 
     gui.add( kBuffer.ui );
@@ -38,14 +40,13 @@ void ofApp::setup() {
     graphics.add( bDrawFirstContour.set("draw 1st contours", true));
     graphics.add( contoursAlphaStart.set("cont alpha start", 255, 0, 255));
     graphics.add( colorizeBackground.set("colorize background", false) );
-    graphics.add( backgroundAlpha.set("background alpha", 0, 0, 255) );
+    graphics.add( backgroundAlpha.set("background alpha", 0.0f, 0.0f, 1.0f) );
     
     gui.add( graphics );
     gui.minimizeAll();
     gui.loadFromFile("settings.xml");
     
     bDrawGui = true;
-
 
     colors.resize(4);
     
@@ -64,15 +65,15 @@ void ofApp::update() {
 	// there is a new contour and we are connected
 	if( kBuffer.update() ) {    
         
+        // makes the operations on the delayed frames
         for( size_t i=0; i<numDelays; ++i ){
             ops.update( i, kBuffer.delay(i, delayFrames) );
         }
         
         // -------------------- UPDATE YOUR GRAPHICS HERE -----------------
-        alphaStep = contoursAlphaStart / (numDelays+1);    
+        alphaStep = contoursAlphaStart / (numDelays+2);    
 
-        if( bDelayFill ){
-            
+        if( bDelayFill ){ // code for masking the fill -------
             masker.mask.begin();
                 ofClear(0, 0, 0, 0);
                 ofFill();                    
@@ -85,103 +86,98 @@ void ofApp::update() {
                 for ( int i=numDelays-1; i>=min; --i ){
                     ofSetColor( fillAlphaStart - i*fillStep );  
                     for( auto & cont : ops.buffer[i] ) {                    
-                        drawPolyline(cont.contour);
+                        cont.draw();
                     }                 
                 }
-                ofSetColor(0);
-                
             masker.mask.end();
             
             masker.canvas.begin();
-                ofClear( 0 );
-                ofFill();
-                // so each contour has its own color
-                for ( int i=numDelays-1; i>=0; --i ){
-                    for( auto & cont : ops.buffer[i] ) {   
-                        ofSetColor( getLabelColor(cont), 255 );
-                        ofDrawRectangle( cont.contour.getBoundingBox() );
-                    }         
-                }
-
+                fillGraphics();
             masker.canvas.end();     
-        }
+        } // ---------------- finished fill masking ----------
+
 
         fbo.begin();
-            ofClear(0, 0, 0, 255);
+            ofClear(0, 0, 0, 0);
             
-            if(colorizeBackground){
-                ofFill();
-                ofSetColor( colors[0], backgroundAlpha );
-                ofDrawRectangle( 0, 0, ofGetWidth(), ofGetHeight() );                
-            }
-
             if( bDelayFill ){
                 masker.draw(0, 0);
             }
 
-            for ( int i=numDelays-1; i>=0; --i ){
+            for ( int i=numDelays-1; i>=0; --i ){ // here you are drawing the borders --------------
                 
                 if( i==0){
                     if(bBlackNow){
                         ofSetColor(0);
                         ofFill();
-                        for( auto & cont : ops.buffer[0] ) {                    
-                            drawPolyline(cont.contour);
+                        for( auto & cont : ops.buffer[i] ) {                    
+                            cont.draw();
                         }  
                     }        
 
-                    for( auto & cont : ops.buffer[0] ) {   
-                        
+                    for( auto & cont : ops.buffer[i] ) {   
                         ofPoint center = cont.contour.getCentroid2D();   
                         ofSetColor( getLabelColor(cont) );    
-                        ofDrawBitmapString( "id " + ofToString(cont.label), center.x, center.y );   
+                        ofDrawBitmapString( "id " + ofToString(cont.label) + "\nspd " + ofToString(cont.velocity),center.x, center.y );   
                     }  
-
                 }
                 
                 if( (bDrawContours && i>0) || (i==0 && bDrawFirstContour) ){
                     ofNoFill();
                     for( auto & cont : ops.buffer[i] ){
                         ofSetColor( getLabelColor(cont), contoursAlphaStart - i*alphaStep );
-                        drawPolyline(cont.contour);
+                        cont.draw();
                     }    
                 }
-            }    
+            } // -------------- finished drawing the borders -------------    
         fbo.end();
-
     }
+}
 
+
+void ofApp::fillGraphics() {
+    // this is the code where you draw the internal mask texture
+    ofClear( 0, 0, 0, 0 ); // this will set the fill base color, black
+    ofFill();
+    // so each contour has its own color
+    for ( int i=numDelays-1; i>=0; --i ){
+        for( auto & cont : ops.buffer[i] ) {   
+            ofSetColor( getLabelColor(cont), 255 );
+            ofDrawRectangle( cont.contour.getBoundingBox() );
+        }         
+    }
 }
 
 const ofColor & ofApp::getLabelColor( const np::CvContour & cont ) const {
+    // this is the code where you get the color for each different contour
     int index = cont.label % colors.size();
     return colors[index];
 }
 
-void ofApp::drawPolyline( const ofPolyline & line ) {
-    
-    ofBeginShape();
-        const vector<ofPoint> & vertices =  line.getVertices();
-        int max = vertices.size();
-        if(max>0){
-            for ( size_t i=0; i<max; ++i ){
-                ofVertex( vertices[i].x, vertices[i].y );
-            }
-        }
-    ofEndShape();
-    
-}
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-
-    ofBackground(0);  
-    fbo.draw(0, 0);
     
+    if(colorizeBackground){
+        ofBackground( ofColor::black.getLerped(colors[0], backgroundAlpha ) );           
+    }else {
+        ofBackground( 0 );
+    }
+    
+    ofSetColor(255);
+    fbo.draw(0, 0);
+
+    // draws the difference graph
+    ofSetColor(255, 0, 0);
+    for(int i=0; i<kBuffer.getWidth(); i++){
+        ofDrawLine(i, 0, i, kBuffer.differenceCols()[i] * 320 );
+    }
+        
     if(bDrawGui){
         gui.draw();
     }         
 }
+
 
 //--------------------------------------------------------------
 void ofApp::keyPressed (int key) {
@@ -201,7 +197,7 @@ void ofApp::keyPressed (int key) {
 
         case 'g' :
             bDrawGui = bDrawGui ? false : true;
-            break;
+            break;            
 	}
 
 }

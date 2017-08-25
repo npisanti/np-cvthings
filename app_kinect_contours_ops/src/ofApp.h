@@ -5,7 +5,6 @@
 #include "ofxKinect.h"
 #include "ofxGui.h"
 #include "np-cvthings.h"
-#include "np-junkrepo.h"
 
 class ofApp : public ofBaseApp {
 
@@ -16,8 +15,10 @@ public:
 	void keyPressed(int key);
     void exit();
     
+
+    void fillGraphics();
+    
     const ofColor & getLabelColor( const np::CvContour & cont ) const;
-    void drawPolyline( const ofPolyline & line );
 
     np::KinectContoursBuffer    kBuffer;
     np::BufferedOperations      ops;
@@ -35,7 +36,7 @@ public:
         ofParameter<bool>           bDrawContours;
         ofParameter<bool>           bDrawFirstContour;
         ofParameter<bool>           colorizeBackground;
-        ofParameter<int>            backgroundAlpha;
+        ofParameter<float>          backgroundAlpha;
         
     ofxPanel    gui;
     bool        bDrawGui;

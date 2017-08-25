@@ -2,10 +2,12 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ContoursBuffer.h"
-#include "CvContour.h"
+#include "np-junkrepo.h"
 
 namespace np{
+
+// this class should be used in the ofApp update() or draw() cycle
+// as it use ofRandom() that is not thread safe
 
 class BufferedOperations {
 
@@ -33,6 +35,7 @@ public:
         ofParameter<int>    smoothPost;
 
         ofParameter<bool>   bJitter;
+        ofParameter<bool>   bFullJitter;
         ofParameter<int>    jitX;
         ofParameter<int>    jitY;
         ofParameter<int>    jitXMod;

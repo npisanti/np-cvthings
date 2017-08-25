@@ -10,8 +10,8 @@
 #include "np-cvthings.h"
 
 
-#define PROJECTOR_RESOLUTION_X 1024
-#define PROJECTOR_RESOLUTION_Y 768
+#define PROJECTOR_RESOLUTION_X 720
+#define PROJECTOR_RESOLUTION_Y 480
 
 class ofApp : public ofBaseApp {
 
@@ -26,11 +26,10 @@ public:
     void keyPressed(int key);
     
     ofxPanel                    gui;
-    ofColor                     blobColors[12];
     
-    np::CalibratedKinectContours krepro;
+    np::KinectContoursBuffer krepro;
         
-    vector<ofPolyline> contours;
+    vector<np::CvContour> contours;
     
     ofParameter<bool> bAlphaTest;
     

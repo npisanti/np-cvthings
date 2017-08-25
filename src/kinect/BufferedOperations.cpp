@@ -10,12 +10,12 @@ np::BufferedOperations::BufferedOperations( ) {
 
     ui.setName( "buffered ops n" + ofToString(++number) );
 
-    ui.add( bSmoothPre.set("smooth", true) );
+    ui.add( bSmoothPre.set("smooth", false) );
     ui.add( smoothPre.set("smoothing px", 5, 1, 50) );
     ui.add( smoothPreMod.set("smoothing MOD", 0, -50, 50) );
     ui.add( smoothMode.set("smoothing mode", 0.0f, 0.0f, 1.0f) );
 
-    ui.add( bExpand.set("expand", true));    
+    ui.add( bExpand.set("expand", false));    
     ui.add( expand.set("expand px", 40, 0, 600));
     ui.add( expandMod.set("expand MOD", 0, -300, 300));
     ui.add( bExpandMode.set("centroid expand", true));
@@ -24,6 +24,7 @@ np::BufferedOperations::BufferedOperations( ) {
     ui.add( smoothPost.set("post smoothing px", 15, 1, 100) );
     
     ui.add( bJitter.set("jitter ops", false) );
+    ui.add( bFullJitter.set("full jitter", false) );
     ui.add( jitX.set(    "jitter x", 0, 0, 100) );
     ui.add( jitXMod.set( "jit x mod", 0, -100, 100) );
     ui.add( jitY.set(    "jitter y", 0, 0, 100) );
@@ -73,21 +74,35 @@ void np::BufferedOperations::update( int n, const vector<CvContour> contours ) {
     
     }
     
-    if( bJitter ){
+    if( bJitter ) {
+        if( bFullJitter) {
+            int jx = jitX + jitXMod*n;
+            int jy = jitY + jitYMod*n;
+            int offX = ofRandom( -jx, jx );
+            int offY = ofRandom( -jy, jy );
             
-        int jx = jitX + jitXMod*n;
-        int jy = jitY + jitYMod*n;
-        
-        for(size_t i=0; i<buffer[n].size(); ++i ){                
-            vector<ofPoint> & vertices = buffer[n][i].contour.getVertices();
+            for(size_t i=0; i<buffer[n].size(); ++i ){                
+                vector<ofPoint> & vertices = buffer[n][i].contour.getVertices();
 
-            for (int vertexIndex=0; vertexIndex<vertices.size(); vertexIndex++) {
-                vertices[vertexIndex].x += ofRandom( -jx, jx );
-                vertices[vertexIndex].y += ofRandom( -jy, jy );
+                for (int vertexIndex=0; vertexIndex<vertices.size(); vertexIndex++) {
+                    vertices[vertexIndex].x += offX;
+                    vertices[vertexIndex].y += offY;
+                }
+            }
+        } else {
+            int jx = jitX + jitXMod*n;
+            int jy = jitY + jitYMod*n;
+            
+            for(size_t i=0; i<buffer[n].size(); ++i ){                
+                vector<ofPoint> & vertices = buffer[n][i].contour.getVertices();
+
+                for (int vertexIndex=0; vertexIndex<vertices.size(); vertexIndex++) {
+                    vertices[vertexIndex].x += ofRandom( -jx, jx );
+                    vertices[vertexIndex].y += ofRandom( -jy, jy );
+                }
             }
         }
-    
-    }    
+    }
     
 }
 

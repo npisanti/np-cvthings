@@ -2,7 +2,7 @@
 #pragma once
 
 #include "ofMain.h"
-#include "CvContour.h"
+#include "np-junkrepo.h"
 
 namespace np {
     
