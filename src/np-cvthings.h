@@ -7,7 +7,10 @@
 #include "cv/Difference.h"
 #include "cv/ThresholdMasker.h"
 
-#include "kinect/KinectContoursBuffer.h"
-#include "kinect/BufferedOperations.h"
+#include "contops/BufferedOperations.h"
 
-#include "contops/ContoursBuffer.h"
+#include "buffers/ThreadedBuffer.h"
+#include "buffers/ContoursBuffer.h"
+#include "buffers/KinectContoursBuffer.h"
+
+#include "gray/KinectGraySource.h"
