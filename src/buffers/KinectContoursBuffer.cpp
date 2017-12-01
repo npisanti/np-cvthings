@@ -206,6 +206,7 @@ bool np::KinectContoursBuffer::update() {
 }
 
 const vector<np::CvContour> & np::KinectContoursBuffer::delay( int i, int frames ) const {
+	i = (i>0) ? i : 0;
     int n = readIndex - i*frames;
     while( n  < 0 ) n += bufferSize;
     return buffer[n];    

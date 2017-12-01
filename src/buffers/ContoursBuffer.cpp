@@ -28,6 +28,7 @@ void np::ContoursBuffer::push( const vector<np::CvContour> & newContours ) {
 }
 
 const vector<np::CvContour> & np::ContoursBuffer::delay(int i) const {
+	i = (i>0) ? i : 0;
     int n = readIndex - i;
     while( n  < 0 ) n += bufferSize;
     return buffer[n];

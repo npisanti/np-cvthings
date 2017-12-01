@@ -201,6 +201,7 @@ bool np::ThreadedBuffer::update() {
 }
 
 const vector<np::CvContour> & np::ThreadedBuffer::delay( int frames, int i ) const {
+	i = (i>0) ? i : 0;
     int n = readIndex - i*frames;
     while( n  < 0 ) n += bufferSize;
     return buffer[n];    
