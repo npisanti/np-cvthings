@@ -14,3 +14,4 @@
 #include "buffers/KinectContoursBuffer.h"
 
 #include "gray/KinectGraySource.h"
+#include "gray/LibreKGraySource.h"
