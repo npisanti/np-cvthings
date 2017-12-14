@@ -172,6 +172,9 @@ void np::ThreadedBuffer::threadedFunction() {
                 contours[i].hole = contourFinder.getHole(i);
                 contours[i].label = contourFinder.getLabel(i);
                 contours[i].velocity = ofxCv::toOf(contourFinder.getVelocity(i));
+                ofPoint center = contours[i].contour.getCentroid2D();
+                contours[i].center.x = center.x;
+                contours[i].center.y = center.y;
             }   
             
             writeIndex = b;        
