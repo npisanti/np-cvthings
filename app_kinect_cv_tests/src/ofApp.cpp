@@ -19,7 +19,7 @@ void ofApp::setup() {
 
 	// tilt on startup
 	angle = 0;
-	kinect.setCameraTiltAngle(angle);
+	//kinect.setCameraTiltAngle(angle);
     // ----------------------------------------------------------------------------------
     
     tMasker.setup(640, 480, ofGetWidth(), ofGetHeight());

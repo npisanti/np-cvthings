@@ -189,7 +189,8 @@ void np::ThreadedBuffer::threadedFunction() {
 
 void np::ThreadedBuffer::exit() {
     contoursMutex.lock();
-        waitForThread(true, 800);
+        //waitForThread(true, 800);
+        stopThread();
     contoursMutex.unlock();
 }
 
