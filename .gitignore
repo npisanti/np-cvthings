@@ -4,6 +4,7 @@
 doxygen/doxygen_sqlite3.db
 doxygen/html
 
+app_cheap_chroma/bin/data/*.png
 
 # Some general ignore patterns
 

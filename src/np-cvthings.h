@@ -15,3 +15,7 @@
 
 #include "gray/KinectGraySource.h"
 #include "gray/LibreKGraySource.h"
+
+#include "shadows/Shadows.h"
+#include "shadows/ContoursOperator.h"
+#include "shadows/operations/Delays.h"
