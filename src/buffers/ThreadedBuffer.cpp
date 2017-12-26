@@ -34,7 +34,11 @@ np::ThreadedBuffer::ThreadedBuffer(){
 
 
 void np::ThreadedBuffer::setup( int bufferSize, GrayImageSource & gray, int projectorW, int projectorH ) {
-    translateMode = 1;
+	if(projectorW!=640 && projectorH!=480){
+		translateMode = 1;
+	}else{
+		translateMode = 0;
+	}
     calculateAspect ( projectorW, projectorH );
     setup( bufferSize, gray );
 }
@@ -58,7 +62,7 @@ void np::ThreadedBuffer::setup( int bufferSize, GrayImageSource & gray ) {
     differenceColumns.resize( framediffMax );
     for( size_t i=0; i<framediffMax; ++i ){
         differenceBuffer[i].allocate( 640, 480, OF_IMAGE_GRAYSCALE);
-        differenceColumns[i].resize( projectorW );
+        differenceColumns[i].resize( 640 );
     }
     ofxCv::imitate(previous, differenceBuffer[0]); 
     diffRead = 0;
@@ -108,7 +112,7 @@ void np::ThreadedBuffer::threadedFunction() {
             columnMean = ofxCv::meanCols( differenceBuffer[diffWrite] );
             
             for(int i = 0; i < 640; i++) {
-                differenceColumns[diffWrite][i] = ofMap( columnMean.at<uint8_t>(i, 0), 0, UINT8_MAX, 0.0f, 1.0f, true );            
+                differenceColumns[diffWrite][i] = ofMap( columnMean.at<uint8_t>(i, 0), 0, UINT8_MAX, 0.0f, 1.0f, true );
             }
             
             diffRead = diffWrite;
@@ -182,7 +186,7 @@ void np::ThreadedBuffer::threadedFunction() {
             contoursMutex.unlock();
         }
         
-        sleep( msec );
+        ofSleepMillis( msec );
     }
 }    
 

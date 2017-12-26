@@ -1,0 +1,16 @@
+<SETTINGS>
+	<threaded_buffer>
+		<find_holes>1</find_holes>
+		<nearThresh>202.959</nearThresh>
+		<farThresh>45.5357</farThresh>
+		<minArea>714.286</minArea>
+		<maxArea>106607</maxArea>
+		<finder_thresh>15</finder_thresh>
+		<tracker_persistence>15</tracker_persistence>
+		<tracker_maxDistance>32</tracker_maxDistance>
+		<simplify>1</simplify>
+		<tolerance>0</tolerance>
+		<mirror>0</mirror>
+	</threaded_buffer>
+<SETTINGS/>
+</SETTINGS>
